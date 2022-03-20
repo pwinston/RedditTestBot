@@ -1,6 +1,8 @@
 import os
+import time
 
 from flask import render_template
+import humanize
 import praw
 
 SUBREDDIT = "cscareerquestions"
@@ -25,12 +27,24 @@ def create_reddit():
         user_agent=f"lonelybot by {auth['username']}",
     )
 
+class Post:
+    def __init__(self, submission):
+        self.submission = submission
+        self.title = submission.title
+        self.url = submission.url
+        self.num_comments = submission.num_comments
+        self.ago = self.ago_string()
+
+    def ago_string(self):
+        created = self.submission.created_utc
+        return humanize.naturaltime(time.time() - created)
+
 def get_submissions(subreddit):
     reddit = create_reddit()
     subreddit = reddit.subreddit(subreddit)
     new_posts = subreddit.new()
     posts = [x for x in new_posts if x.num_comments <= MAX_COMMENTS]
-    return posts
+    return [Post(x) for x in posts]
 
 
 def list():
