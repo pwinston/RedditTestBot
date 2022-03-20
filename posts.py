@@ -37,16 +37,17 @@ class Post:
         created = self.obj.created_utc
         return humanize.naturaltime(self.now - created)
 
-def get_submissions(subreddit):
-    reddit = create_reddit()
-    subreddit = reddit.subreddit(subreddit)
-    new_posts = subreddit.new()
-    now = time.time()
-    posts = [x for x in new_posts if x.num_comments <= MAX_COMMENTS]
-    return [Post(now, x) for x in posts]
+class Subreddit:
+    def __init__(self, subreddit):
+        reddit = create_reddit()
+        self.subreddit = reddit.subreddit(subreddit)
+        self.now = time.time()
 
+    def get_posts(self):
+        new_posts = self.subreddit.new()
+        posts = [x for x in new_posts if x.num_comments <= MAX_COMMENTS]
+        return [Post(self.now, x) for x in posts]
 
 def list():
-    reddit = create_reddit()
-    items = get_submissions(SUBREDDIT)
-    return render_template('posts.html', items=items)
+    subreddit = Subreddit(SUBREDDIT)
+    return render_template('posts.html', items=subreddit.get_posts())
