@@ -6,8 +6,8 @@
 
 {% block content %}
 <ul>
-    {% for post in posts: %}
-        <li>{{ post.ago }} {{ post.num_comments}} - <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% for item in items: %}
+        <li>{{ item.ago }} - {{ item.obj.num_comments}} - <a href="{{ item.obj.url }}">{{ item.obj.title }}</a></li>
 	{% endfor %}
 	</ul>
 {% endblock %}

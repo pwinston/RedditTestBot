@@ -6,7 +6,7 @@ import humanize
 import praw
 
 SUBREDDIT = "cscareerquestions"
-MAX_COMMENTS = 2
+MAX_COMMENTS = 3
 
 auth = {
     'script': os.environ['REDDIT_SCRIPT'],
@@ -28,26 +28,25 @@ def create_reddit():
     )
 
 class Post:
-    def __init__(self, submission):
-        self.submission = submission
-        self.title = submission.title
-        self.url = submission.url
-        self.num_comments = submission.num_comments
+    def __init__(self, now, submission):
+        self.now = now
+        self.obj = submission
         self.ago = self.ago_string()
 
     def ago_string(self):
-        created = self.submission.created_utc
-        return humanize.naturaltime(time.time() - created)
+        created = self.obj.created_utc
+        return humanize.naturaltime(self.now - created)
 
 def get_submissions(subreddit):
     reddit = create_reddit()
     subreddit = reddit.subreddit(subreddit)
     new_posts = subreddit.new()
+    now = time.time()
     posts = [x for x in new_posts if x.num_comments <= MAX_COMMENTS]
-    return [Post(x) for x in posts]
+    return [Post(now, x) for x in posts]
 
 
 def list():
     reddit = create_reddit()
-    posts = get_submissions(SUBREDDIT)
-    return render_template('posts.html', posts=posts)
+    items = get_submissions(SUBREDDIT)
+    return render_template('posts.html', items=items)
