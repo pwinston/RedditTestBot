@@ -4,6 +4,7 @@ from flask import render_template
 import praw
 
 SUBREDDIT = "cscareerquestions"
+MAX_COMMENTS = 2
 
 auth = {
     'script': os.environ['REDDIT_SCRIPT'],
@@ -24,8 +25,15 @@ def create_reddit():
         user_agent=f"lonelybot by {auth['username']}",
     )
 
+def get_submissions(subreddit):
+    reddit = create_reddit()
+    subreddit = reddit.subreddit(subreddit)
+    new_posts = subreddit.new()
+    posts = [x for x in new_posts if x.num_comments <= MAX_COMMENTS]
+    return posts
+
 
 def list():
     reddit = create_reddit()
-    subreddit = reddit.subreddit(SUBREDDIT)
-    return render_template('posts.html', posts=subreddit.new())
+    posts = get_submissions(SUBREDDIT)
+    return render_template('posts.html', posts=posts)
