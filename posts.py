@@ -27,5 +27,5 @@ def create_reddit():
 
 def list():
     reddit = create_reddit()
-    titles = [x.title for x in reddit.subreddit(SUBREDDIT).hot(limit=5)]
-    return render_template('posts.html', titles=titles)
+    subreddit = reddit.subreddit(SUBREDDIT)
+    return render_template('posts.html', posts=subreddit.new())
